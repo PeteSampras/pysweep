@@ -37,6 +37,7 @@ if __name__=='__main__':
         print("############################################################")
         pass
         sys.exit()
+    print(f"Target {sys.argv}")
     # Setting ip targets
     targets = sys.argv
     targets.pop(0)
