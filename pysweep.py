@@ -7,9 +7,10 @@ def main(ip_target,cdir):
     if len(cdir)<1:
         cdir="/24"
     ip_range=str(ip_target)+cdir
-    net = ipaddress.ip_network(ip_range)
+    #net = ipaddress.ip_network(ip_range)
+    net = list(ipaddress.ip_network(ip_range,False).hosts())
     for ip in net:
-        action = "fping -a -C 5 -q "+ip
+        action = "fping -a -C 5 -q "+str(ip)
         try:
             results = subprocess.check_output(action,stderr=subprocess.STDOUT,shell=True)
             results_split = results.split(b":")
@@ -37,14 +38,15 @@ if __name__=='__main__':
         print("############################################################")
         pass
         sys.exit()
-    print(f"Target {sys.argv}")
+
     # Setting ip targets
     targets = sys.argv
     targets.pop(0)
-
+    target = targets[0]
     ip_list=[]
     start_time = datetime.now()
-    if targets.count>1:
-        main(targets.index(0),targets.index(1))
+    if len(targets) > 1:
+        cdir = targets[1]
+        main(target,cdir)
     else:
-        main(targets.index(0),"/24")
+        main(target,"/24")
