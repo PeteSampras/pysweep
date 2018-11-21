@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 import subprocess
+import sys
+import ipaddress
 from datetime import datetime
-def main():
-    ip_target = "10.0.2."
-    for ip in range(0,256):
-        target=ip_target+str(ip)
-        action = "fping -a -C 5 -q "+target
+def main(ip_target,cdir):
+    if len(cdir)<1:
+        cdir="/24"
+    ip_range=str(ip_target)+cdir
+    net = ipaddress.ip_network(ip_range)
+    for ip in net:
+        action = "fping -a -C 5 -q "+ip
         try:
             results = subprocess.check_output(action,stderr=subprocess.STDOUT,shell=True)
             results_split = results.split(b":")
@@ -25,6 +29,21 @@ def main():
     print('Total time to scan took: (hh:mm:ss.ms) {}'.format(time_elapsed))
 
 if __name__=='__main__':
+    if len(sys.argv) < 2:
+        print("")
+        print("Usage: python pysweep.py <ip> /<CDIR>")
+        print("Example: python reconscan.py 192.168.1.101 /27")
+        print("")
+        print("############################################################")
+        pass
+        sys.exit()
+    # Setting ip targets
+    targets = sys.argv
+    targets.pop(0)
+
     ip_list=[]
     start_time = datetime.now()
-    main()
+    if targets.count>1:
+        main(targets.index(0),targets.index(1))
+    else:
+        main(targets.index(0),"/24")
